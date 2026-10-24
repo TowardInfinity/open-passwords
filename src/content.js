@@ -79,8 +79,21 @@ function hasStrongIdentitySignal(el) {
 
 const LOGINISH = /log[\s_-]?in|sign[\s_-]?in|auth|session|sso|oauth|account|idp|passport/i;
 
+// checkout/shipping forms are address-autofill territory, not logins: an email field plus a
+// "Continue"/"Next" button must not look like a two-step login (the browser handles addresses)
+const ADDRESS_AC =
+  /\b(address-line[12]|street-address|postal-code|address-level[1234]|country(-name)?|(given|family|additional)-name|shipping|billing|cc-)/i;
+function isAddressAutofillContext(el) {
+  const scope = el.form || document;
+  return Array.from(scope.querySelectorAll("input, select")).some(
+    (i) => i !== el && ADDRESS_AC.test((i.getAttribute("autocomplete") || "").toLowerCase()),
+  );
+}
+
 // gates the two-step case where no password field exists yet
 function loginishContext(el) {
+  // a form carrying shipping/billing address fields is checkout, not a login's first step
+  if (isAddressAutofillContext(el)) return false;
   if (LOGINISH.test(location.hostname + location.pathname)) return true;
   const form = el.form;
   if (form && LOGINISH.test(form.getAttribute("action") || "")) return true;
