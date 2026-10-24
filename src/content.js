@@ -60,6 +60,12 @@ function isSearchOrComboField(el) {
 }
 
 function pageHasVisiblePassword(field) {
+  // a field inside its own <form> must not borrow a password from an unrelated form elsewhere
+  // on the page (e.g. a footer newsletter email next to a separate login form). scope to the
+  // field's own form; the formless case (SPA logins with no <form>) still looks page-wide.
+  if (field?.form) {
+    return Array.from(field.form.querySelectorAll('input[type="password"]')).some(isVisible);
+  }
   if (Array.from(document.querySelectorAll('input[type="password"]')).some(isVisible)) return true;
   const root = field?.getRootNode?.();
   if (root && root !== document && root.querySelectorAll) {
