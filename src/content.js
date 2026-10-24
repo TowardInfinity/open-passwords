@@ -104,8 +104,12 @@ function loginishContext(el) {
   const form = el.form;
   if (form && LOGINISH.test(form.getAttribute("action") || "")) return true;
   const scope = form || document;
+  // only an explicit "sign in"/"log in" button is a strong enough signal on its own. a bare
+  // "Continue"/"Next" is used by waitlists, onboarding, and multi-step forms that aren't logins,
+  // so it must not trip the two-step fallback by itself. genuine two-step logins (Google,
+  // Microsoft, Acme) set autocomplete=username on the email box and are caught before this gate.
   return Array.from(scope.querySelectorAll("button, input[type=submit]")).some((b) =>
-    /\b(sign[\s-]?in|log[\s-]?in|continue|next)\b/i.test(b.textContent || b.value || ""),
+    /\b(sign[\s-]?in|log[\s-]?in)\b/i.test(b.textContent || b.value || ""),
   );
 }
 

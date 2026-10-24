@@ -22,6 +22,7 @@ const negatives = [
   ["profile-edit", ["#display-name","#profile-email","#profile-phone"]],
   ["otp-password-field", ["#otp-pass"]],
   ["mixed-footer-email", ["#foot-email"]],
+  ["waitlist", ["#waitlist-email"]],
 ];
 for (const [pg, sels] of negatives) {
   const page = await ctx.newPage();
